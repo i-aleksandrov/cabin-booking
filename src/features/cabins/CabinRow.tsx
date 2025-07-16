@@ -1,4 +1,15 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+import type { Cabin as CabinModel } from '../../models/cabin.model';
+import { formatCurrency } from '../../utils/helpers';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteCabin } from '../../services/apiCabins';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
+import CreateCabinForm from './CreateCabinForm';
+
+interface CabinRowProps {
+  cabin: CabinModel;
+}
 
 const TableRow = styled.div`
   display: grid;
@@ -25,16 +36,57 @@ const Cabin = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
-  font-family: "Sono";
+  font-family: 'Sono';
 `;
 
 const Price = styled.div`
-  font-family: "Sono";
+  font-family: 'Sono';
   font-weight: 600;
 `;
 
 const Discount = styled.div`
-  font-family: "Sono";
+  font-family: 'Sono';
   font-weight: 500;
   color: var(--color-green-700);
 `;
+
+export default function CabinRow({ cabin }: CabinRowProps) {
+  const [showForm, setShowForm] = useState(false);
+  const { image, name, maxCapacity, regularPrice, discount, id } = cabin;
+
+  const queryClient = useQueryClient();
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: (id: number) => deleteCabin(id),
+    onSuccess: () => {
+      toast.success(`Cabin ${id} deleted`);
+      queryClient.invalidateQueries({
+        queryKey: ['cabins'],
+      });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  return (
+    <>
+      <TableRow>
+        <Img src={image} />
+        <Cabin>{name}</Cabin>
+        <div>Fits up to {maxCapacity} guests</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        {discount ? (
+          <Discount>{formatCurrency(discount)}</Discount>
+        ) : (
+          <span>&mdash;</span>
+        )}
+        <button onClick={() => setShowForm((isShown) => !isShown)}>Edit</button>
+        <button onClick={() => mutate(id)} disabled={isPending}>
+          Delete
+        </button>
+      </TableRow>
+      {showForm && <CreateCabinForm cabinToEdit={cabin} />}
+    </>
+  );
+}
