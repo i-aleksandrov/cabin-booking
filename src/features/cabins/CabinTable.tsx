@@ -1,57 +1,67 @@
 import { useQuery } from '@tanstack/react-query';
-import styled from 'styled-components';
 import { getCabins } from '../../services/apiCabins';
 import Spinner from '../../ui/Spinner';
 import CabinRow from './CabinRow';
-
-const Table = styled.div`
-  border: 1px solid var(--color-grey-200);
-
-  font-size: 1.4rem;
-  background-color: var(--color-grey-0);
-  border-radius: 7px;
-  overflow: hidden;
-`;
-
-const TableHeader = styled.header`
-  display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-
-  background-color: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-100);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  font-weight: 600;
-  color: var(--color-grey-600);
-  padding: 1.6rem 2.4rem;
-`;
+import Table from '../../ui/Table';
+import Menus from '../../ui/Menus';
+import { useSearchParams } from 'react-router-dom';
+import type { FilterValues } from '../../models/filter.model';
+import type { Cabin } from '../../models/cabin.model';
 
 export default function CabinTable() {
   const { isPending, data: cabins } = useQuery({
     queryKey: ['cabins'],
     queryFn: getCabins,
   });
+  const [searchParams] = useSearchParams();
 
   if (isPending) {
     return <Spinner />;
   }
+
+  const filterValue: FilterValues =
+    (searchParams.get('discount') as FilterValues) ?? 'all';
+
+  let filteredCabins;
+  if (filterValue === 'all') {
+    filteredCabins = cabins;
+  } else if (filterValue === 'with-discount') {
+    filteredCabins = cabins?.filter((c) => c.discount > 0);
+  } else {
+    filteredCabins = cabins?.filter((c) => c.discount === 0);
+  }
+
+  const sortBy = searchParams.get('sortBy') ?? 'startDate-asc';
+  const [field, sortOrder] = sortBy.split('-') as [keyof Cabin, 'asc' | 'desc'];
+
+  filteredCabins?.sort((a, b) => {
+    if (sortOrder === 'asc') {
+      return typeof a[field] === 'string' && b[field] === 'string'
+        ? a[field].localeCompare(b[field])
+        : (a[field] as number) - (b[field] as number);
+    }
+
+    return typeof a[field] === 'string' && b[field] === 'string'
+      ? b[field].localeCompare(a[field])
+      : (b[field] as number) - (a[field] as number);
+  });
+
   return (
-    <div>
-      <Table role="table">
-        <TableHeader role="row">
+    <Menus>
+      <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
+        <Table.Header>
           <div></div>
           <div>Cabin</div>
           <div>Capacity</div>
           <div>Price</div>
           <div>Discount</div>
           <div></div>
-        </TableHeader>
-        {cabins?.map((cabin) => (
-          <CabinRow cabin={cabin} key={cabin.id} />
-        ))}
+        </Table.Header>
+        <Table.Body
+          data={filteredCabins!}
+          render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
+        />
       </Table>
-    </div>
+    </Menus>
   );
 }

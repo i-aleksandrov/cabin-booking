@@ -1,6 +1,35 @@
-import styled from "styled-components";
+import {
+  cloneElement,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { HiXMark } from 'react-icons/hi2';
+import styled from 'styled-components';
 
-const StyledModal = styled.div`
+interface StyledModalProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ref: any;
+}
+
+interface ModalProps extends React.PropsWithChildren {
+  name: string;
+}
+
+interface ModalOpenProps extends React.PropsWithChildren {
+  windowName: string;
+}
+
+interface ModalContextModel {
+  open: (windowName: string) => void;
+  close: () => void;
+  openWindowName: string;
+}
+
+const StyledModal = styled.div<StyledModalProps>`
   position: fixed;
   top: 50%;
   left: 50%;
@@ -48,3 +77,67 @@ const Button = styled.button`
     color: var(--color-grey-500);
   }
 `;
+
+const ModalContext = createContext<ModalContextModel>({
+  open: () => {},
+  close: () => {},
+  openWindowName: '',
+});
+
+function Window({ children, name }: ModalProps) {
+  const { openWindowName, close } = useContext(ModalContext);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    function handleClick(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
+        close();
+      }
+    }
+
+    document.addEventListener('click', handleClick, true);
+
+    return () => {
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, [close]);
+
+  if (name !== openWindowName) {
+    return null;
+  }
+
+  return createPortal(
+    <Overlay>
+      <StyledModal ref={ref}>
+        <Button onClick={close}>
+          <HiXMark />
+        </Button>
+        <div>{cloneElement(children, { onClose: close })}</div>
+      </StyledModal>
+    </Overlay>,
+    document.body
+  );
+}
+
+function Open({ children, windowName }: ModalOpenProps) {
+  const { open } = useContext(ModalContext);
+  return cloneElement(children, { onClick: () => open(windowName) });
+}
+
+function Modal({ children }: React.PropsWithChildren) {
+  const [openWindowName, setOpenName] = useState('');
+
+  const close = () => setOpenName('');
+  const open = setOpenName;
+
+  return (
+    <ModalContext.Provider value={{ close, open, openWindowName }}>
+      {children}
+    </ModalContext.Provider>
+  );
+}
+
+Modal.Open = Open;
+Modal.Window = Window;
+
+export default Modal;

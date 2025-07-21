@@ -12,9 +12,10 @@ import FormRow from '../../ui/FormRow';
 
 interface CreateCabinFormProps extends React.PropsWithChildren {
   cabinToEdit?: Cabin;
+  onClose?: () => void;
 }
 
-function CreateCabinForm({ cabinToEdit }: CreateCabinFormProps) {
+function CreateCabinForm({ cabinToEdit, onClose }: CreateCabinFormProps) {
   const isEditing = !!cabinToEdit;
   const queryClient = useQueryClient();
 
@@ -26,6 +27,7 @@ function CreateCabinForm({ cabinToEdit }: CreateCabinFormProps) {
   const { isPending, mutate } = useMutation({
     mutationFn: createCabin,
     onSuccess: () => {
+      onClose?.();
       toast.success('Cabin created');
       queryClient.invalidateQueries({
         queryKey: ['cabins'],
@@ -43,10 +45,13 @@ function CreateCabinForm({ cabinToEdit }: CreateCabinFormProps) {
     mutate({ ...data, image: data.image.item(0)! });
   }
 
-  function onValidationError(errors) {}
+  function onValidationError() {}
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onValidationError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onValidationError)}
+      type={onClose ? 'modal' : 'standard'}
+    >
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"
@@ -118,12 +123,17 @@ function CreateCabinForm({ cabinToEdit }: CreateCabinFormProps) {
       </FormRow>
 
       <FormRow>
-        <Button size="medium" variation="secondary" type="reset">
+        <Button
+          $size="medium"
+          $variation="secondary"
+          type="reset"
+          onClick={() => onClose?.()}
+        >
           Cancel
         </Button>
         <Button
-          size="medium"
-          variation="primary"
+          $size="medium"
+          $variation="primary"
           type="submit"
           disabled={isPending}
         >

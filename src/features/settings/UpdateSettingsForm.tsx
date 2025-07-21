@@ -22,7 +22,7 @@ function UpdateSettingsForm() {
   }
 
   return (
-    <Form>
+    <Form type="standard">
       <FormRow label="Minimum nights/booking">
         <Input
           type="number"

@@ -1,4 +1,14 @@
-import styled, { css } from "styled-components";
+import { useSearchParams } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+
+interface FilterButtonProps {
+  $active: boolean;
+}
+
+interface FilterProps<T extends string> {
+  filterField: string;
+  options: { label: string; value: T }[];
+}
 
 const StyledFilter = styled.div`
   border: 1px solid var(--color-grey-100);
@@ -10,12 +20,12 @@ const StyledFilter = styled.div`
   gap: 0.4rem;
 `;
 
-const FilterButton = styled.button`
+const FilterButton = styled.button<FilterButtonProps>`
   background-color: var(--color-grey-0);
   border: none;
 
   ${(props) =>
-    props.active &&
+    props.$active &&
     css`
       background-color: var(--color-brand-600);
       color: var(--color-brand-50);
@@ -33,3 +43,30 @@ const FilterButton = styled.button`
     color: var(--color-brand-50);
   }
 `;
+
+export default function Filter<T extends string>({
+  filterField,
+  options,
+}: FilterProps<T>) {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  function handleClick(value: string) {
+    searchParams.set(filterField, value);
+    setSearchParams(searchParams);
+  }
+
+  return (
+    <StyledFilter>
+      {options.map((option) => (
+        <FilterButton
+          key={option.value}
+          $active={searchParams.get(filterField) === option.value}
+          disabled={searchParams.get(filterField) === option.value}
+          onClick={() => handleClick(option.value)}
+        >
+          {option.label}
+        </FilterButton>
+      ))}
+    </StyledFilter>
+  );
+}

@@ -38,8 +38,6 @@ export async function createCabin(
     .select<string, Cabin>()
     .single();
 
-  console.log('created cabin: ', createdCabin);
-
   if (error) {
     throw new Error('Error creating cabin');
   }
