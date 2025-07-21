@@ -7,6 +7,7 @@ import Menus from '../../ui/Menus';
 import { useSearchParams } from 'react-router-dom';
 import type { FilterValues } from '../../models/filter.model';
 import type { Cabin } from '../../models/cabin.model';
+import Empty from '../../ui/Empty';
 
 export default function CabinTable() {
   const { isPending, data: cabins } = useQuery({
@@ -17,6 +18,10 @@ export default function CabinTable() {
 
   if (isPending) {
     return <Spinner />;
+  }
+
+  if (!cabins?.length) {
+    return <Empty resourceName="cabins" />;
   }
 
   const filterValue: FilterValues =
