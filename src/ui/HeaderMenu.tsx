@@ -1,8 +1,10 @@
 import styled from 'styled-components';
-import Logout from '../features/authentication/Logout';
-import ButtonIcon from './ButtonIcon';
 import { HiOutlineUser } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
+import Logout from '../features/authentication/Logout';
+import ButtonIcon from './ButtonIcon';
+import DarkModeToggle from './DarkModeToggle';
 
 const StyledHeaderMenu = styled.ul`
   display: flex;
@@ -11,6 +13,7 @@ const StyledHeaderMenu = styled.ul`
 
 function HeaderMenu() {
   const navigate = useNavigate();
+  const { setCurrentTheme } = useTheme();
 
   return (
     <StyledHeaderMenu>
@@ -18,6 +21,9 @@ function HeaderMenu() {
         <ButtonIcon onClick={() => navigate('/account')}>
           <HiOutlineUser />
         </ButtonIcon>
+      </li>
+      <li>
+        <DarkModeToggle onClick={setCurrentTheme} />
       </li>
       <li>
         <Logout />
