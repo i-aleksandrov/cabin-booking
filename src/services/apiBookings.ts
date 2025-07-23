@@ -62,7 +62,7 @@ export async function getBooking(id: string): Promise<Booking> {
 }
 
 // Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
-export async function getBookingsAfterDate(date) {
+export async function getBookingsAfterDate(date: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select('created_at, totalPrice, extrasPrice')
@@ -74,11 +74,11 @@ export async function getBookingsAfterDate(date) {
     throw new Error('Bookings could not get loaded');
   }
 
-  return data;
+  return data as Booking[];
 }
 
 // Returns all STAYS that are were created after the given date
-export async function getStaysAfterDate(date) {
+export async function getStaysAfterDate(date: string) {
   const { data, error } = await supabase
     .from('bookings')
     // .select('*')
@@ -91,7 +91,7 @@ export async function getStaysAfterDate(date) {
     throw new Error('Bookings could not get loaded');
   }
 
-  return data;
+  return data as Booking[];
 }
 
 // Activity means that there is a check in or a check out today
@@ -104,15 +104,11 @@ export async function getStaysTodayActivity() {
     )
     .order('created_at');
 
-  // Equivalent to this. But by querying this, we only download the data we actually need, otherwise we would need ALL bookings ever created
-  // (stay.status === 'unconfirmed' && isToday(new Date(stay.startDate))) ||
-  // (stay.status === 'checked-in' && isToday(new Date(stay.endDate)))
-
   if (error) {
     console.error(error);
     throw new Error('Bookings could not get loaded');
   }
-  return data;
+  return data as Booking[];
 }
 
 export async function updateBooking(

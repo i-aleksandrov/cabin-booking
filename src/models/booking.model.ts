@@ -13,5 +13,10 @@ export interface Booking {
   isPaid: boolean;
   observations: string;
   cabins: { name: string };
-  guests: { fullName: string; email: string };
+  guests: {
+    fullName: string;
+    email: string;
+    countryFlag?: string;
+    country?: string;
+  };
 }

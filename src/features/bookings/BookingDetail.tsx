@@ -42,7 +42,7 @@ function BookingDetail() {
 
   return (
     <>
-      <Row type="horizontal">
+      <Row $type="horizontal">
         <HeadingGroup>
           <Heading as="h1">Booking #{booking!.id}</Heading>
           <Tag $type={statusToTagName[booking!.status]}>
