@@ -18,5 +18,6 @@ export interface Booking {
     email: string;
     countryFlag?: string;
     country?: string;
+    nationalID?: string;
   };
 }

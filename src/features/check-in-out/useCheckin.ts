@@ -13,6 +13,7 @@ export function useCheckin() {
       breakfast,
     }: {
       bookingId: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       breakfast: any;
     }) =>
       updateBooking(bookingId!, {

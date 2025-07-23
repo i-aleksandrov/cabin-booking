@@ -40,7 +40,8 @@ function CreateCabinForm({ cabinToEdit, onClose }: CreateCabinFormProps) {
   });
 
   function onSubmit(
-    data: Omit<Cabin, 'id' | 'created_at' | 'image'> & { image: FileList }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any
   ) {
     mutate({ ...data, image: data.image.item(0)! });
   }

@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 
-type ThemeContextType = 'dark-mode' | 'light-mode';
+export type ThemeContextType = 'dark-mode' | 'light-mode';
 
 interface ThemeContextModel {
   currentTheme: ThemeContextType;
-  setCurrentTheme: (theme: ThemeContextType) => void;
+  setCurrentTheme: () => void;
 }
 
 const initialValue: ThemeContextModel = {
@@ -17,7 +17,9 @@ const ThemeContext = createContext<ThemeContextModel>(initialValue);
 
 function ThemeProvider({ children }: React.PropsWithChildren) {
   const [theme, setTheme] = useLocalStorageState<ThemeContextType>(
-    'light-mode',
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark-mode'
+      : 'light-mode',
     'cabins-theme'
   );
 
@@ -54,4 +56,5 @@ function useTheme() {
   return context;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { useTheme, ThemeProvider };

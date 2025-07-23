@@ -119,10 +119,14 @@ const startDataDark = [
   },
 ];
 
-function prepareData(startData, stays: Booking[]) {
+function prepareData(
+  startData: { duration: string; value: number; color: string }[],
+  stays: Booking[]
+) {
   // A bit ugly code, but sometimes this is what it takes when working with real data 😅
 
-  function incArrayValue(arr, field) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function incArrayValue(arr: any[], field: string) {
     return arr.map((obj) =>
       obj.duration === field ? { ...obj, value: obj.value + 1 } : obj
     );
@@ -177,14 +181,15 @@ function DurationChart({ confirmedStays }: DurationChartProps) {
             ))}
           </Pie>
           <Tooltip />
-          <Legend
-            verticalAlign="middle"
-            align="right"
-            layout="vertical"
-            width="30%"
-            iconSize={15}
-            iconType="circle"
-          />
+          <ResponsiveContainer width="30%" height="100%">
+            <Legend
+              verticalAlign="middle"
+              align="right"
+              layout="vertical"
+              iconSize={15}
+              iconType="circle"
+            />
+          </ResponsiveContainer>
         </PieChart>
       </ResponsiveContainer>
     </ChartBox>

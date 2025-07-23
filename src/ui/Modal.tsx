@@ -71,9 +71,6 @@ const Button = styled.button`
   & svg {
     width: 2.4rem;
     height: 2.4rem;
-    /* Sometimes we need both */
-    /* fill: var(--color-grey-500);
-    stroke: var(--color-grey-500); */
     color: var(--color-grey-500);
   }
 `;
@@ -112,7 +109,12 @@ function Window({ children, name }: ModalProps) {
         <Button onClick={close}>
           <HiXMark />
         </Button>
-        <div>{cloneElement(children, { onClose: close })}</div>
+        <div>
+          {cloneElement(
+            children as React.ReactElement<{ onClose: () => void }>,
+            { onClose: close }
+          )}
+        </div>
       </StyledModal>
     </Overlay>,
     document.body
@@ -121,7 +123,9 @@ function Window({ children, name }: ModalProps) {
 
 function Open({ children, windowName }: ModalOpenProps) {
   const { open } = useContext(ModalContext);
-  return cloneElement(children, { onClick: () => open(windowName) });
+  return cloneElement(children as React.ReactElement<{ onClick: () => void }>, {
+    onClick: () => open(windowName),
+  });
 }
 
 function Modal({ children }: React.PropsWithChildren) {

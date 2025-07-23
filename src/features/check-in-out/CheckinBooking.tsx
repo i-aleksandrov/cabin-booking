@@ -39,6 +39,8 @@ function CheckinBooking() {
     return <Spinner />;
   }
 
+  console.log(booking);
+
   const {
     id: bookingId,
     guests,
@@ -46,7 +48,7 @@ function CheckinBooking() {
     numGuests,
     hasBreakfast,
     numNights,
-  } = booking;
+  } = booking!;
 
   const optionalBreakfastPrice =
     settings!.breakfastPrice * numNights * numGuests;
@@ -61,7 +63,7 @@ function CheckinBooking() {
 
     if (addBreakfast) {
       checkin({
-        bookingId,
+        bookingId: bookingId.toString(),
         breakfast: {
           hasBreakfast: true,
           extrasPrice: optionalBreakfastPrice,
@@ -69,13 +71,13 @@ function CheckinBooking() {
         },
       });
     } else {
-      checkin({ bookingId, breakfast: {} });
+      checkin({ bookingId: bookingId.toString(), breakfast: {} });
     }
   }
 
   return (
     <>
-      <Row type="horizontal">
+      <Row $type="horizontal">
         <Heading as="h1">Check in booking #{bookingId}</Heading>
         <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
       </Row>
