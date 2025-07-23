@@ -181,15 +181,14 @@ function DurationChart({ confirmedStays }: DurationChartProps) {
             ))}
           </Pie>
           <Tooltip />
-          <ResponsiveContainer width="30%" height="100%">
-            <Legend
-              verticalAlign="middle"
-              align="right"
-              layout="vertical"
-              iconSize={15}
-              iconType="circle"
-            />
-          </ResponsiveContainer>
+          <Legend
+            verticalAlign="middle"
+            align="right"
+            layout="vertical"
+            iconSize={15}
+            width={140}
+            iconType="circle"
+          />
         </PieChart>
       </ResponsiveContainer>
     </ChartBox>
